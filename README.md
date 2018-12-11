@@ -1,4 +1,5 @@
 # Mini-Project: Full-Stack MERN
+Mini-project creating and practicing full-stack web application development with JavaScript MERN frameworks (MongoDB, Express, React and Node.js).
 
 ## Challenge
 This is an opportunity to get some practice with the technologies that we have covered so far. You will have all of today and tomorrow to do this, so take the time and opportunity to learn.
