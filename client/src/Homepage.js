@@ -1,5 +1,6 @@
 import React from 'react';
 import Band from './Band';
+import Album from './Album';
 import Navbar from './Navbar';
 
 const getBands = () => {
@@ -217,6 +218,7 @@ const getBands = () => {
                 genre={band.genre}
                 url={band.url}
             />
+            <Album album={band.albums[0]} />
           </div>
       )
   })
