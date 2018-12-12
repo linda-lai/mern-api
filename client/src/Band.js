@@ -6,7 +6,6 @@ const Band = (props) => {
          <div>
             <h1>{props.name}</h1>
             <p>Genre: {props.genre}</p>
-            <p>Albums: {props.albums}</p>
             <a href={props.url}>View {props.name} in Spotify</a>
          </div>
         );
