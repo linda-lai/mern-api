@@ -1,9 +1,12 @@
+// DEPENDENCIES
 const express = require('express') // returns a function
 const Joi = require('joi'); // returns a class
 
+// APP AND ENVIRONMENT VARIABLES
 const app = express()
 const port = process.env.PORT || 5000 ;
 
+// 'DATABASE'
 const bandsList =
 [
   {
@@ -212,12 +215,12 @@ const bandsList =
   }
 ]
 
-// Middleware required to get access the body of an HTTP request
+// MIDDLEWARE required to get access the body of an HTTP request
 app.use(express.json());
 
-// GET
+// GET REQUESTS
 app.get('/', (req, res) => {
-  return res.send('Hello world! From API');
+  return res.send('Hello world! Welcome to the  API');
 });
 
 app.get('/bands', (req, res) => {
@@ -235,34 +238,90 @@ app.get('/bands/:id', (req, res) => {
   return res.send(band);
 });
 
-// POST
+// POST REQUESTS
 app.post('/bands', (req, res) => {
-  // 1. Get values from the body - looks at request object, extracts id/name & store as variables
-  const { id, name } = req.body;
+  const { id, name, members, genre, albums, url } = req.body;
+  const band = { id, name, members, genre, albums, url };
 
-  // Create new band object
-  const band = { id: id, name: name}; // using destructuring
-  
-  // 2. Validate we have ID and Name, return response if successful or error
+  const { error } = validateBand(req.body)
+
+  if (error) return res.status(400).send(error.details[0].message);
+
+  const newBand = {
+    id: req.body.id,
+    name: req.body.name,
+    members: band.members = req.body.members,
+    genre: band.genre = req.body.genre,
+    albums: band.albums = req.body.albums,
+    url: band.url = req.body.url
+  }
+
+  bandsList.push(newBand);
+  return res.send(newBand);
+});
+
+// PUT REQUESTS
+app.put('/bands/:id', (req, res) => {
+  const { id } = req.params
+  const band = bandsList.find(band => band.id === parseInt(id));
+  if (!band) {
+    res.status(404).send('Band not found!')
+  }
+  const { error } = validateBand(req.body);
+  if (error) return res.send(400).send(error.details[0].message);
+
+  // const updateBand = {
+  //   id: req.body.id,
+  //   name: req.body.name,
+  //   members: band.members = req.body.members,
+  //   genre: band.genre = req.body.genre,
+  //   albums: band.albums = req.body.albums,
+  //   url: band.url = req.body.url
+  // }
+
+  const updateId = req.body.id;
+  band.id = updateId;
+  const updateName = req.body.name;
+  band.name = updateName;
+  const updateMembers = req.body.members;
+  band.members = updateMembers
+  const updateGenre = req.body.genre;
+  band.genre = updateGenre;
+  const updateAlbums = req.body.albums;
+  band.albums = updateAlbums
+  const updateUrl = req.body.url;
+  band.url = updateUrl;
+
+  res.send(band);
+
+});
+
+// DELETE REQUESTS
+app.delete('/bands/:id', (req, res) => {
+  const id = parseInt(req.params.id)
+  const band = bandsList.find(band => band.id === id);
+  if (!band) {
+    return res.status(404).send('Band not found!')
+  }
+  const index = bandsList.indexOf(band);
+  bandsList.splice(index, 1);
+  return res.send(bandsList)
+});
+
+// VALIDATION
+function validateBand(band) {
   const schema = {
     id: Joi.number().required(),
     name: Joi.string().min(2).required(),
-  }
-  
-  // Check if band object matches schema
-  const valid = Joi.validate(band, schema);
-  console.log(valid)
-  if (valid.error) {
-    const errorMessage = valid.error.details[0].message
-    return res.status(400).send(errorMessage);
-  }
-  // 3. Insert new band into array
-  bandsList.push(band);
+    members: Joi.array().required(),
+    genre: Joi.string().required(),
+    albums: Joi.array().required(),
+    url: Joi.string().required()
+  };
+  return Joi.validate(band, schema);
+}
 
-  // 4. Send back bands that have been added into array
-  return res.send(band);
-});
-
+// PORT
 app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`);
 })
