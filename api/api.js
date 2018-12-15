@@ -240,20 +240,24 @@ app.get('/bands/:id', (req, res) => {
 
 // POST REQUESTS
 app.post('/bands', (req, res) => {
-  const { id, name } = req.body;
-  const band = { id, name };
-  const schema = {
-    id: Joi.number().required(),
-    name: Joi.string().min(2).required(),
+  const { id, name, members, genre, albums, url } = req.body;
+  const band = { id, name, members, genre, albums, url };
+
+  const { error } = validateBand(req.body)
+
+  if (error) return res.status(400).send(error.details[0].message);
+
+  const newBand = {
+    id: req.body.id,
+    name: req.body.name,
+    members: band.members = req.body.members,
+    genre: band.genre = req.body.genre,
+    albums: band.albums = req.body.albums,
+    url: band.url = req.body.url
   }
-  const valid = Joi.validate(band, schema);
-  console.log(valid)
-  if (valid.error) {
-    const errorMessage = valid.error.details[0].message
-    return res.status(400).send(errorMessage);
-  }
-  bandsList.push(band);
-  return res.send(band);
+
+  bandsList.push(newBand);
+  return res.send(newBand);
 });
 
 // PUT REQUESTS
@@ -263,21 +267,33 @@ app.put('/bands/:id', (req, res) => {
   if (!band) {
     res.status(404).send('Band not found!')
   }
+  const { error } = validateBand(req.body);
+  if (error) return res.send(400).send(error.details[0].message);
 
-  const schema = {
-    id: Joi.number().required(),
-    name: Joi.string().min(2).required(),
-  }
-  const valid = Joi.validate(band, schema);
-  console.log(valid)
-  if (valid.error) {
-    const errorMessage = valid.error.details[0].message
-    return res.status(400).send(errorMessage);
-  }
+  // const updateBand = {
+  //   id: req.body.id,
+  //   name: req.body.name,
+  //   members: band.members = req.body.members,
+  //   genre: band.genre = req.body.genre,
+  //   albums: band.albums = req.body.albums,
+  //   url: band.url = req.body.url
+  // }
 
-  const bandName = req.body.name;
-  band.name = bandName;
-  return res.send(band);
+  const updateId = req.body.id;
+  band.id = updateId;
+  const updateName = req.body.name;
+  band.name = updateName;
+  const updateMembers = req.body.members;
+  band.members = updateMembers
+  const updateGenre = req.body.genre;
+  band.genre = updateGenre;
+  const updateAlbums = req.body.albums;
+  band.albums = updateAlbums
+  const updateUrl = req.body.url;
+  band.url = updateUrl;
+
+  res.send(band);
+
 });
 
 // DELETE REQUESTS
@@ -291,6 +307,19 @@ app.delete('/bands/:id', (req, res) => {
   bandsList.splice(index, 1);
   return res.send(bandsList)
 });
+
+// VALIDATION
+function validateBand(band) {
+  const schema = {
+    id: Joi.number().required(),
+    name: Joi.string().min(2).required(),
+    members: Joi.array().required(),
+    genre: Joi.string().required(),
+    albums: Joi.array().required(),
+    url: Joi.string().required()
+  };
+  return Joi.validate(band, schema);
+}
 
 // PORT
 app.listen(port, () => {
