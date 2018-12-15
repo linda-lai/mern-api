@@ -239,7 +239,7 @@ app.get('/bands/:id', (req, res) => {
 app.post('/bands', (req, res) => {
   // 1. Get values from the body - looks at request object, extracts id/name & store as variables
   const { id, name } = req.body;
-  
+
   // Create new band object
   const band = { id: id, name: name}; // using destructuring
   
