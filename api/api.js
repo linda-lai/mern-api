@@ -1,4 +1,5 @@
-const express = require('express')
+const express = require('express') // returns a function
+const Joi = require('joi'); // returns a class
 
 const app = express()
 const port = process.env.PORT || 5000 ;
@@ -211,8 +212,10 @@ const bandsList =
   }
 ]
 
-// To access the body of an HTTP request, middleware is required
+// Middleware required to get access the body of an HTTP request
+app.use(express.json());
 
+// GET
 app.get('/', (req, res) => {
   return res.send('Hello world! From API');
 });
@@ -232,12 +235,32 @@ app.get('/bands/:id', (req, res) => {
   return res.send(band);
 });
 
+// POST
 app.post('/bands', (req, res) => {
-  // 1. Get values from the body
-  // 2. Validate we have ID and Name
+  // 1. Get values from the body - looks at request object, extracts id/name & store as variables
+  const { id, name } = req.body;
+  
+  // Create new band object
+  const band = { id: id, name: name}; // using destructuring
+  
+  // 2. Validate we have ID and Name, return response if successful or error
+  const schema = {
+    id: Joi.number().required(),
+    name: Joi.string().min(2).required(),
+  }
+  
+  // Check if band object matches schema
+  const valid = Joi.validate(band, schema);
+  console.log(valid)
+  if (valid.error) {
+    const errorMessage = valid.error.details[0].message
+    return res.status(400).send(errorMessage);
+  }
   // 3. Insert new band into array
-  // 4. Send back bands that have been added into array
+  bandsList.push(band);
 
+  // 4. Send back bands that have been added into array
+  return res.send(band);
 });
 
 app.listen(port, () => {
