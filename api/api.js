@@ -1,9 +1,12 @@
+// DEPENDENCIES
 const express = require('express') // returns a function
 const Joi = require('joi'); // returns a class
 
+// APP AND ENVIRONMENT VARIABLES
 const app = express()
 const port = process.env.PORT || 5000 ;
 
+// 'DATABASE'
 const bandsList =
 [
   {
@@ -212,12 +215,12 @@ const bandsList =
   }
 ]
 
-// Middleware required to get access the body of an HTTP request
+// MIDDLEWARE required to get access the body of an HTTP request
 app.use(express.json());
 
-// GET
+// GET REQUESTS
 app.get('/', (req, res) => {
-  return res.send('Hello world! From API');
+  return res.send('Hello world! Welcome to the  API');
 });
 
 app.get('/bands', (req, res) => {
@@ -235,34 +238,61 @@ app.get('/bands/:id', (req, res) => {
   return res.send(band);
 });
 
-// POST
+// POST REQUESTS
 app.post('/bands', (req, res) => {
-  // 1. Get values from the body - looks at request object, extracts id/name & store as variables
   const { id, name } = req.body;
-
-  // Create new band object
-  const band = { id: id, name: name}; // using destructuring
-  
-  // 2. Validate we have ID and Name, return response if successful or error
+  const band = { id, name };
   const schema = {
     id: Joi.number().required(),
     name: Joi.string().min(2).required(),
   }
-  
-  // Check if band object matches schema
   const valid = Joi.validate(band, schema);
   console.log(valid)
   if (valid.error) {
     const errorMessage = valid.error.details[0].message
     return res.status(400).send(errorMessage);
   }
-  // 3. Insert new band into array
   bandsList.push(band);
-
-  // 4. Send back bands that have been added into array
   return res.send(band);
 });
 
+// PUT REQUESTS
+app.put('/bands/:id', (req, res) => {
+  const { id } = req.params
+  const band = bandsList.find(band => band.id === parseInt(id));
+  if (!band) {
+    res.status(404).send('Band not found!')
+  }
+
+  const schema = {
+    id: Joi.number().required(),
+    name: Joi.string().min(2).required(),
+  }
+  const valid = Joi.validate(band, schema);
+  console.log(valid)
+  if (valid.error) {
+    const errorMessage = valid.error.details[0].message
+    return res.status(400).send(errorMessage);
+  }
+
+  const bandName = req.body.name;
+  band.name = bandName;
+  return res.send(band);
+});
+
+// DELETE REQUESTS
+app.delete('/bands/:id', (req, res) => {
+  const id = parseInt(req.params.id)
+  const band = bandsList.find(band => band.id === id);
+  if (!band) {
+    return res.status(404).send('Band not found!')
+  }
+  const index = bandsList.indexOf(band);
+  bandsList.splice(index, 1);
+  return res.send(bandsList)
+});
+
+// PORT
 app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`);
 })
