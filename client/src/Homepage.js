@@ -218,10 +218,14 @@ const getBands = () => {
                 genre={band.genre}
                 url={band.url}
             />
-            <Album album={band.albums[0]} />
+            {
+                band.albums.map(album => {
+                    <Album album={album} />
+                })
+            }
           </div>
       )
-  })
+  })    
 }
 
 const Homepage = () => {
