@@ -2,11 +2,11 @@
 const express = require('express') // returns a function
 const Joi = require('joi'); // returns a class
 
-// APP AND ENVIRONMENT VARIABLES
+// APP & ENVIRONMENT VARIABLES
 const app = express()
 const port = process.env.PORT || 5000 ;
 
-// 'DATABASE'
+// DATABASE
 const bandsList =
 [
   {
@@ -163,64 +163,16 @@ const bandsList =
       }
     ],
     "url": "https://open.spotify.com/artist/1gR0gsQYfi6joyO1dlp76N"
- },
- {
-    "id": 4,
-    "name":"Booka Shade",
-    "members": [
-         "Walter Merziger",
-         "Arno Kammermeier"
-    ],
-     "genre": "Tech House",
-     "albums": [
-      {
-        "title": "Movements",
-        "year": 2006,
-        "tracks": 12,
-        "songs": [
-            "Night Falls",
-            "Body Language (Interpretation)",
-            "Paper Moon",
-            "The Birds And The Beats / At The Window",
-            "Darko",
-            "Pong Pang",
-            "Mandarine Girl (Album Version)",
-            "Take A Ride",
-            "Wasting Time",
-            "In White Rooms",
-            "Hallelujah USA",
-            "Lost High"
-        ]
-      },
-      {
-        "title": "More!",
-        "year": 2010,
-        "tracks": 11,
-        "songs": [
-            "Havanna Sex Dwarf",
-            "Donut (Interpretation)",
-            "Regenerate",
-            "The Door",
-            "Teenage Spaceman",
-            "Divine",
-            "Scaramanga",
-            "L.A.tely",
-            "Bad Love",
-            "No Difference",
-            "This Is Not The Time"
-        ]
-      }
-    ],
-    "url": "https://open.spotify.com/artist/2CKaDZ1Yo8YnWega9IeUzB"
-  }
+ }
 ]
 
-// MIDDLEWARE required to get access the body of an HTTP request
+// MIDDLEWARE
 app.use(express.json());
 
-// GET REQUESTS
+// REQUESTS
+// 'GET' REQUESTS
 app.get('/', (req, res) => {
-  return res.send('Hello world! Welcome to the  API');
+  return res.send('Hello world! Welcome to the BeatsBuddy Express API!');
 });
 
 app.get('/bands', (req, res) => {
@@ -228,33 +180,24 @@ app.get('/bands', (req, res) => {
 });
 
 app.get('/bands/:id', (req, res) => {
-  // const id = req.params.id;
-  const { id } = req.params
+  const { id } = req.params // OR const id = req.params.id;
   const band = bandsList.find(band => band.id === parseInt(id));
+
   if (!band) {
     // 200 - success, 300 - redirect, 400 - client error, 500 - server error
     res.status(404).send('Band not found!')
   }
+
   return res.send(band);
 });
 
-// POST REQUESTS
+// 'POST' REQUESTS
 app.post('/bands', (req, res) => {
   const { id, name, members, genre, albums, url } = req.body;
-  const band = { id, name, members, genre, albums, url };
+  const newBand = { id, name, members, genre, albums, url };
 
   const { error } = validateBand(req.body)
-
   if (error) return res.status(400).send(error.details[0].message);
-
-  const newBand = {
-    id: req.body.id,
-    name: req.body.name,
-    members: band.members = req.body.members,
-    genre: band.genre = req.body.genre,
-    albums: band.albums = req.body.albums,
-    url: band.url = req.body.url
-  }
 
   bandsList.push(newBand);
   return res.send(newBand);
@@ -262,35 +205,22 @@ app.post('/bands', (req, res) => {
 
 // PUT REQUESTS
 app.put('/bands/:id', (req, res) => {
-  const { id } = req.params
+  const { id } = req.params // OR const id = req.params.id;
   const band = bandsList.find(band => band.id === parseInt(id));
+
   if (!band) {
     res.status(404).send('Band not found!')
   }
+  
   const { error } = validateBand(req.body);
   if (error) return res.send(400).send(error.details[0].message);
 
-  // const updateBand = {
-  //   id: req.body.id,
-  //   name: req.body.name,
-  //   members: band.members = req.body.members,
-  //   genre: band.genre = req.body.genre,
-  //   albums: band.albums = req.body.albums,
-  //   url: band.url = req.body.url
-  // }
-
-  const updateId = req.body.id;
-  band.id = updateId;
-  const updateName = req.body.name;
-  band.name = updateName;
-  const updateMembers = req.body.members;
-  band.members = updateMembers
-  const updateGenre = req.body.genre;
-  band.genre = updateGenre;
-  const updateAlbums = req.body.albums;
-  band.albums = updateAlbums
-  const updateUrl = req.body.url;
-  band.url = updateUrl;
+  band.id = req.body.id;
+  band.name = req.body.name;
+  band.members = req.body.members;
+  band.genre = req.body.genre;
+  band.albums = req.body.albums;
+  band.url = req.body.url;
 
   res.send(band);
 
@@ -298,14 +228,17 @@ app.put('/bands/:id', (req, res) => {
 
 // DELETE REQUESTS
 app.delete('/bands/:id', (req, res) => {
-  const id = parseInt(req.params.id)
-  const band = bandsList.find(band => band.id === id);
+  const { id } = req.params // OR const id = req.params.id;
+  const band = bandsList.find(band => band.id === parseInt(id));
+
   if (!band) {
     return res.status(404).send('Band not found!')
   }
+
   const index = bandsList.indexOf(band);
   bandsList.splice(index, 1);
   return res.send(bandsList)
+
 });
 
 // VALIDATION
