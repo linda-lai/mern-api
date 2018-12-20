@@ -1,0 +1,49 @@
+{
+  "id": 4,
+  "name":"Booka Shade",
+  "members": [
+       "Walter Merziger",
+       "Arno Kammermeier"
+  ],
+   "genre": "Tech House",
+   "albums": [
+    {
+      "title": "Movements",
+      "year": 2006,
+      "tracks": 12,
+      "songs": [
+          "Night Falls",
+          "Body Language (Interpretation)",
+          "Paper Moon",
+          "The Birds And The Beats / At The Window",
+          "Darko",
+          "Pong Pang",
+          "Mandarine Girl (Album Version)",
+          "Take A Ride",
+          "Wasting Time",
+          "In White Rooms",
+          "Hallelujah USA",
+          "Lost High"
+      ]
+    },
+    {
+      "title": "More!",
+      "year": 2010,
+      "tracks": 11,
+      "songs": [
+          "Havanna Sex Dwarf",
+          "Donut (Interpretation)",
+          "Regenerate",
+          "The Door",
+          "Teenage Spaceman",
+          "Divine",
+          "Scaramanga",
+          "L.A.tely",
+          "Bad Love",
+          "No Difference",
+          "This Is Not The Time"
+      ]
+    }
+  ],
+  "url": "https://open.spotify.com/artist/2CKaDZ1Yo8YnWega9IeUzB"
+}
